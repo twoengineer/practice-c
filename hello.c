@@ -14,10 +14,13 @@ int main(int argc, char **argv)
   struct rlimit res = { .rlim_cur = RLIM_INFINITY, .rlim_max = RLIM_INFINITY };
   setrlimit(RLIMIT_CORE, &res);
 
-  pthread_t tid;
-  pthread_create(&tid, NULL, test, "a");
+  //使用数组
+  int i, a[5];
+  for(i=0; i<5; i++) {
+    a[i] = i;
+    printf("%d\n", a[i]);
+  }
 
-  sleep(3);
   printf("%s\n", "Hello, World");
   return 0;
 }
