@@ -21,6 +21,12 @@ int main(int argc, char **argv)
     printf("%d\n", a[i]);
   }
 
+  int b[5]={ 1,2,3,4,5 };
+  for(i=0; i<5; i++) {
+    b[i] = i;
+    printf("%d\n", b[i]);
+  }
+
   printf("%s\n", "Hello, World");
   return 0;
 }
