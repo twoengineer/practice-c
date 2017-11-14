@@ -19,8 +19,16 @@ slice * sliceCreate(void *data, size_t len, size_t cap) {
   return s;
 }
 
-void reallocateSlice(slice *s) {
-  size_t newCap = 2 * s->cap;
+void resize(slice *s) {
+  size_t newCap;
+  if (s->len == s->cap) {
+    newCap = 2 * s->cap;
+  } else if (s->len < (s->cap / 4)) {
+    newCap = s->cap / 2;
+  } else {
+    return;
+  }
+
   int *old = s->data;
   int *new = (int *)malloc(newCap * sizeof(int));
   for (size_t i = 0; i < s->len; ++i)
@@ -44,18 +52,45 @@ bool is_empty(slice *s) {
 }
 
 int *at(slice *s, int index) {
+  assert(index >= 0);
   assert(index <= s->cap);
   int *sa = s->data;
-  return sa + index - 1;
+  return sa + index;
 }
 
 void push(slice *s, int item) {
   if (s->len == s->cap) {
-    reallocateSlice(s);
+    resize(s);
   }
   int *d = s->data;
   *(d + s->len) = item;
   s->len++;
+}
+
+void insert(slice *s, int index, int item) {
+  assert(index <= s->cap);
+  if (s->len == s->cap) {
+    resize(s);
+  }
+
+  int *d = s->data;
+  if (index <= s->len) {
+      for (size_t i = s->len; i > index; i--) {
+        *(d + i) = *(d + i - 1);
+      }
+  }
+
+  *(d + index) = item;
+  s->len++;
+}
+
+void prepend(slice *s, int item) {
+  insert(s, 0, item);
+}
+
+int * pop(slice *s) {
+  int *d = s->data;
+  return d + s->len - 1;
 }
 
 int main(int argc, char **argv) {
@@ -109,7 +144,13 @@ int main(int argc, char **argv) {
   printf("array at 10 value is %d\n", *at(s2, 10));
   push(s2, 11);
   printf("array at 11 value is %d\n", *at(s2, 11));
-  printf("array at 12 value is %d\n", *at(s2, 12));
+  prepend(s2, 100);
+  insert(s2, 1, 111);
+  printf("array at 0 value is %d\n", *at(s2, 0));
+  printf("array at 1 value is %d\n", *at(s2, 1));
+  printf("array at 2 value is %d\n", *at(s2, 2));
+  printf("array at 3 value is %d\n", *at(s2, 3));
+  printf("array at end value is %d\n", *pop(s2));
   free(s2);
   return 0;
 }
