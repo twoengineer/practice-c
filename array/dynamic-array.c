@@ -75,7 +75,7 @@ void insert(slice *s, int index, int item) {
 
   int *d = s->data;
   if (index <= s->len) {
-      for (size_t i = s->len; i > index; i--) {
+      for (size_t i = s->len; i > index; --i) {
         *(d + i) = *(d + i - 1);
       }
   }
@@ -88,9 +88,54 @@ void prepend(slice *s, int item) {
   insert(s, 0, item);
 }
 
-int * pop(slice *s) {
+int pop(slice *s) {
   int *d = s->data;
-  return d + s->len - 1;
+  int popVal = *(d + s->len - 1);
+  *(d + s->len - 1) = 0;
+  s->len--;
+  return popVal;
+}
+
+int sliceDelete(slice *s, int index) {
+  assert(index < s->len);
+  assert(index >= 0);
+  int *d = s->data;
+  int deleteVal = *(d + index);
+  for (; index < s->len; ++index) {
+    *(d + index) = *(d + index + 1);
+  }
+  s->len--;
+  return deleteVal;
+}
+
+slice * sliceRemove(slice *s, int value) {
+  int *vals = (int *)malloc(s->len * sizeof(int));
+  slice *sVal = sliceCreate(vals, 0, s->len);
+  int *sd = sVal->data;
+  int *d = s->data;
+  int j = 0;
+  for (int i = 0; i < s->len; ++i) {
+    if (*(d+i) == value) {
+      *(sd + j) = i;
+      ++j; // i since fault ignore this
+      sVal->len++;
+    }
+  }
+
+  for (size_t i = 0; i < sVal->len; ++i) {
+    sliceDelete(s, *(sd + i));
+  }
+  return sVal;
+}
+
+int find(slice *s, int value) {
+  int *d = s->data;
+  for (size_t i = 0; i < s->len; ++i) {
+    if (*(d+i) == value) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 int main(int argc, char **argv) {
@@ -132,25 +177,48 @@ int main(int argc, char **argv) {
   }
   printf("array length is %zu\n", s2->len);
   printf("array caption is %zu\n", s2->cap);
+
   printf("array is or not empty %d\n", is_empty(s2));
+
   int *a8 = at(s2, 8);
   printf("array at 8 value is %d\n", *a8);
   printf("array at 9 value is %d\n", *at(s2, 9));
+
   push(s2, 10);
-  int *s2a1 = s2->data;
-  for (int i = 0; i < 11; ++i) {
-    printf("%d\n", *(s2a1 + i));
-  }
   printf("array at 10 value is %d\n", *at(s2, 10));
   push(s2, 11);
   printf("array at 11 value is %d\n", *at(s2, 11));
+
   prepend(s2, 100);
   insert(s2, 1, 111);
+  insert(s2, 5, 8);
+  insert(s2, 7, 8);
   printf("array at 0 value is %d\n", *at(s2, 0));
   printf("array at 1 value is %d\n", *at(s2, 1));
   printf("array at 2 value is %d\n", *at(s2, 2));
   printf("array at 3 value is %d\n", *at(s2, 3));
-  printf("array at end value is %d\n", *pop(s2));
+  int *s2a1 = s2->data;
+  for (int i = 0; i < s2->len; ++i) {
+    printf("%d\n", *(s2a1 + i));
+  }
+
+  printf("array length is %zu\n", s2->len);
+  printf("array at end value is %d\n", pop(s2));
+
+  printf("array pop after length is %zu\n", s2->len);
+
+  printf("array delete 0 position value %d\n", sliceDelete(s2, 0));
+  printf("array delete after length is %zu\n", s2->len);
+
+  slice *sv = sliceRemove(s2, 8);
+  printf("array remove value %d, indexs: \n", 8);
+  for (int i = 0; i < sv->len; ++i) {
+    printf("%d\n", *((int *)sv->data + i));
+  }
+  free(sv);
+  printf("array remove after length is %zu\n", s2->len);
+
+  printf("array find value 9 postion is %d\n", find(s2, 9));
   free(s2);
   return 0;
 }
