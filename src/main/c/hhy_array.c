@@ -1,6 +1,7 @@
 /*
-* use int type to impl hhy dynamic array
-*/
+ * use int type to impl hhy dynamic array
+ */
+
 #include <assert.h>
 #include <stdlib.h>
 #include "hhy_array.h"

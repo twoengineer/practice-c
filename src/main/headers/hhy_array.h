@@ -1,5 +1,5 @@
-#ifndef PRACTICE_C_DYNAMIC_ARRAY_H__
-#define PRACTICE_C_DYNAMIC_ARRAY_H__
+#ifndef PRACTICE_C_HHY_ARRAY_H__
+#define PRACTICE_C_HHY_ARRAY_H__
 
 typedef struct hhy_array_t {
   void *data;
